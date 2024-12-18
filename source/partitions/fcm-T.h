@@ -271,11 +271,11 @@ void ksi::fcm_T<T>::randomise(std::vector<std::vector<T>> & m)
 {
    try
    {
-      auto czas = std::chrono::system_clock::now();
-      auto interwal = czas.time_since_epoch();
+      // auto czas = std::chrono::system_clock::now();
+      // auto interwal = czas.time_since_epoch();
       std::default_random_engine silnik;
       std::uniform_real_distribution <double> rozklad(0, 1);
-      silnik.seed(interwal.count());
+      silnik.seed(2342342342342334);
       
       for (auto & wiersz : m)
          for (auto & liczba : wiersz)

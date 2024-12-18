@@ -124,7 +124,7 @@ ksi::partition ksi::rfcom::doPartition(const ksi::dataset & ds)
       mV = std::vector<std::vector<double>> (_nClusters);
       
       std::default_random_engine silnik;
-      silnik.seed(std::chrono::system_clock::now().time_since_epoch().count());
+      silnik.seed(2327423743); // std::chrono::system_clock::now().time_since_epoch().count());
       std::uniform_int_distribution<std::size_t> rozklad (0, nXLower - 1);
     
       // initialize cluster centres at random

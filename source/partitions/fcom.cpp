@@ -443,7 +443,7 @@ ksi::partition ksi::fcom::doPartition(const ksi::dataset & ds)
       //   row = std::vector<double> (nAttr, 0.0);
       
       std::default_random_engine silnik;
-      silnik.seed(std::chrono::system_clock::now().time_since_epoch().count());
+      silnik.seed(56756765756765); //std::chrono::system_clock::now().time_since_epoch().count());
       std::uniform_int_distribution<std::size_t> rozklad (0, nX - 1);
       
       // initialize cluster centres at random

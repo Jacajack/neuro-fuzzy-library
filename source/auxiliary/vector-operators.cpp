@@ -188,7 +188,8 @@ namespace ksi
  
 std::vector<double> ksi::get_uniform_unit_random_vector (const std::size_t size)
 {
-    static std::default_random_engine silnik (std::chrono::system_clock::now().time_since_epoch().count());
+    // static std::default_random_engine silnik (std::chrono::system_clock::now().time_since_epoch().count());
+    static std::default_random_engine silnik (21327423736);
     
     std::uniform_real_distribution<double> distro (0.0, 1.0);
     

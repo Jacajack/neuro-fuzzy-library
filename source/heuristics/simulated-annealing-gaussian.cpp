@@ -53,7 +53,7 @@ ksi::simulated_annealing_gaussian::simulated_annealing_gaussian(
     _experimental_data = experimental_data; 
     
     engine = std::default_random_engine();
-    engine.seed(std::chrono::system_clock::now().time_since_epoch().count());
+    engine.seed(4575723753); // std::chrono::system_clock::now().time_since_epoch().count());
     
     distro = std::uniform_real_distribution<double> (-1, 1);
 }

@@ -37,7 +37,7 @@ void ksi::granule::reset_cardinality()
 
 ksi::granule::granule ()
 {
-    _engine.seed (std::chrono::system_clock::now().time_since_epoch().count());
+    _engine.seed(56546545646); //  (std::chrono::system_clock::now().time_since_epoch().count());
     _cardinality = 1.0;
     _quality = -1.0;
     _error = 1.0;

@@ -8,7 +8,7 @@
 
 ksi::data_modifier_incompleter_random::data_modifier_incompleter_random (const double missing_ratio) : _missing_ratio(missing_ratio)
 {
-   random_engine = std::default_random_engine (std::chrono::system_clock::now().time_since_epoch().count());
+   random_engine = std::default_random_engine (12431515141);
    distribution = std::uniform_real_distribution<double> (0.0, 1.0);
 }
 
