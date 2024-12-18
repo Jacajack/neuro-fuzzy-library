@@ -103,7 +103,7 @@ std::ostream& ksi::descriptor_tanh::printLinguisticDescription(std::ostream& ss,
         locationIndex = std::min(std::max(locationIndex, 0), int(tanhLocationDescription.size() - 1));
 
         int slopeIndex;
-        double product =  abs(_slope * descStat.std_dev);
+        double product =  std::abs(_slope * descStat.std_dev);
         if (product >= 5)
             slopeIndex = 0;
         else if (product >= 2)

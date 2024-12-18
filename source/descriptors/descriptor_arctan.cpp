@@ -104,7 +104,7 @@ std::ostream& ksi::descriptor_arctan::printLinguisticDescription(std::ostream& s
       locationIndex = std::min(std::max(locationIndex, 0), int(arctanLocationDescription.size() - 1));
 
       int slopeIndex;
-      double product = abs(_slope * descStat.std_dev);
+      double product = std::abs(_slope * descStat.std_dev);
       if (product >= 10)
          slopeIndex = 0;
       else if (product >= 4)
