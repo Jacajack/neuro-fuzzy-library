@@ -14,6 +14,7 @@ add_library(neuro_fuzzy SHARED
 )
 
 target_link_libraries(neuro_fuzzy PUBLIC nlohmann_json::nlohmann_json)
+target_include_directories(neuro_fuzzy PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 target_compile_options(neuro_fuzzy PRIVATE
 	-Wall
@@ -30,3 +31,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 add_executable(experiment "${CMAKE_CURRENT_SOURCE_DIR}/source/main.cpp")
 target_link_libraries(experiment neuro_fuzzy)
+
+add_executable(nfl "${CMAKE_CURRENT_SOURCE_DIR}/source/nfl/nfl.cpp")
+target_link_libraries(nfl neuro_fuzzy)
+target_compile_options(nfl PUBLIC
+	-Wall
+	-Wextra
+)
+
