@@ -61,7 +61,7 @@ void ksi::exp_005::classification()
 
    const bool NORMALISATION = false;
 
-   const double ETA = 0.001;
+   const double ETA = 0.01;
    const double POSITIVE_CLASS_LABEL = 1.0;
    const double NEGATIVE_CLASS_LABEL = 0.0;
 
@@ -75,6 +75,8 @@ void ksi::exp_005::classification()
    std::string TRAIN   (dataset + "/" + dataset_name + ".train");
    std::string TEST    (dataset + "/" + dataset_name + ".test");
    std::string RESULTS (results_dir + "/results-" + dataset_name);
+
+   #if 0
 
    // MA 
    {
@@ -301,6 +303,8 @@ void ksi::exp_005::classification()
       }
    }
 
+   #endif
+
    // MAHALANOBIS PROTOTYPE ANNBFIS NEURO-FUZZY CLASSIFIER
    {
       const int NUMBER_OF_RULES = 3;
@@ -308,8 +312,8 @@ void ksi::exp_005::classification()
       const double NEGATIVE { 0 };
       const ksi::imp_reichenbach IMPLICATION;
 
-      // auto th = ksi::roc_threshold::mean;  /// @todo przywróć pętlę
-      for (auto th : thresholds)  // for all thresholds
+      auto th = ksi::roc_threshold::mean;  /// @todo przywróć pętlę
+      // for (auto th : thresholds)  // for all thresholds
       {
          ksi::fac_prototype_mahalanobis_classification factory;
 
@@ -340,6 +344,8 @@ void ksi::exp_005::classification()
          std::cout << std::endl;
       }
    }
+
+   #if 0
 
    // THREE-WAY DECISION NEURO-FUZZY CLASSIFIER (single noncommitment value)
    {
@@ -462,10 +468,14 @@ void ksi::exp_005::classification()
          }
       }
    }
+
+   #endif
 }
 
 void ksi::exp_005::regression()
 {
+   return; 
+   
    std::cout << std::endl;
    std::cout <<  "regression" << std::endl;
 
@@ -495,6 +505,8 @@ void ksi::exp_005::regression()
    std::string TRAIN   (dataset + "/" + dataset_name + ".train");
    std::string TEST    (dataset + "/" + dataset_name + ".test");
    std::string RESULTS (results_dir + "/results-" + dataset_name);
+
+   #if 0
 
    // MA
    {
@@ -569,6 +581,8 @@ void ksi::exp_005::regression()
       std::cout << "\tResults saved to file " << result_file << std::endl;
       std::cout << std::endl;
    }
+   #endif
+
    // MAHALANOBIS PROTOTYPE TSK
    {
       //const int NUMBER_OF_RULES = 3;

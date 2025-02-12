@@ -17,7 +17,7 @@ namespace ksi
 {
    class rulebase : public set_of_cooperating_granules
    {
-   protected:    
+   public:    
       /** rules of the rulebase */
       std::vector<rule *> rules;
        

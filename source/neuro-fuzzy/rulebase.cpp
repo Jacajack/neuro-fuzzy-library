@@ -125,6 +125,13 @@ void ksi::rulebase::cummulate_differentials(const std::vector< double >& X,
       double rozniczkaMA = 0;
       if (std::fabs(suma_wag) > EPSILON)
       {
+         // rozniczka = 
+         //    weight
+         //    * roznica
+         //    * (last_rules_localisations_weights[i].first - odpowiedz)
+         //    * last_rules_localisations_weights[i].second  / suma_wag;
+
+
          rozniczka = weight * roznica * (last_rules_localisations_weights[i].first - odpowiedz) / suma_wag;
          rozniczkaMA = weight * last_rules_localisations_weights[i].second / suma_wag;
       }

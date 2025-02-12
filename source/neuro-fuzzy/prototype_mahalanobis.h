@@ -15,11 +15,19 @@ namespace ksi
     @date 2023-06-26 */ 
    class prototype_mahalanobis : public prototype
    {
-   protected:
+   public:
        Matrix<double> _A;   ///< matrix for the Mahalanobis distance
+        Matrix<double> m_L;
        std::vector<double> _centre; ///< localisation of prototype centre (attributes)
        
+        // Matrix<double> A() const
+        // {
+        //         auto L = m_L;
+        //         return L * L.transpose();
+        // }
+
        Matrix<double> _d_A;   ///< differencial for matrix for the Mahalanobis distance
+       Matrix<double> m_d_L; 
        std::vector<double> _d_centre; ///< differentials of centres
        
     public:

@@ -16,7 +16,7 @@ namespace ksi
 {
    class rule : public granule
    {
-   protected:
+   public:
       premise     * pPremise     = nullptr;
       consequence * pConsequence = nullptr;
       t_norm      * pTnorma      = nullptr;

@@ -2,6 +2,8 @@
 #include <vector>
 #include <numeric>
 #include <string>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 #include "../neuro-fuzzy/neuro-fuzzy-system.h"
 #include "../neuro-fuzzy/nfs_prototype.h"
@@ -17,6 +19,7 @@
 #include "../auxiliary/error-RMSE.h"
 #include "../gan/discriminative_model.h"
 #include "../gan/generative_model.h"
+#include "prototype_mahalanobis.h"
 
 ksi::annbfis_prototype::annbfis_prototype ()
 {
@@ -144,6 +147,11 @@ void ksi::annbfis_prototype::createFuzzyRulebase(int nClusteringIterations,
                                              const ksi::dataset& train,
                                              const ksi::dataset& validation)
 {
+   // eta = 1e6;
+   // eta = 1e-7;
+   eta = 1;
+   nTuningIterations = 100;
+
    try
    {
        if (not _pImplication)
@@ -214,16 +222,53 @@ void ksi::annbfis_prototype::createFuzzyRulebase(int nClusteringIterations,
          _pRulebase->addRule(regula);
       }
       //debug(*_pRulebase);      
-         
+      
+      auto debug_dump = nlohmann::json::object();
+      auto &states = debug_dump["states"];
+
+      debug_dump["trainX"] = wTrainX;
+
+      auto dump_state = [&](){
+         static int iteration = 0;
+
+         nlohmann::json j;
+         j["error"] = errors.empty() ? 0 : errors.front();
+         j["iteration"] = iteration;
+         j["rules"] = nlohmann::json::array();
+         j["eta"] = eta;
+
+         int rule_num = 0;
+         for (auto rule : _pRulebase->rules)
+         {
+            j["rules"][rule_num] = nlohmann::json::object();
+            auto &premise = dynamic_cast<ksi::prototype_mahalanobis&>(*rule->pPremise);
+            j["rules"][rule_num]["c"] = premise._centre;
+            j["rules"][rule_num]["dc"] = premise._d_centre;
+            j["rules"][rule_num]["A"] = premise._A;
+            j["rules"][rule_num]["dA"] = premise._d_A;
+
+            rule_num++;
+         }
+
+         // std::cout << j;
+         iteration++;
+
+         return j;
+
+      };
+
+      states.push_back(dump_state());
+
       try
       {
          // elaboration of conclusions:
          std::vector<std::vector<double>> G_przyklad_regula; 
 
          // mam zgrupowane dane, teraz trzeba nastroic system
-         for (int i = 0; i < _nTuningIterations; i++)
+         for (int i = 0; i < nTuningIterations; i++)
          {
             if (i % 2 == 0)
+            // if (i == 0 || i > 1)
             { 
                G_przyklad_regula.clear(); // dla konkluzji
 
@@ -241,6 +286,7 @@ void ksi::annbfis_prototype::createFuzzyRulebase(int nClusteringIterations,
                      Gs.push_back(p.second);
 
                   G_przyklad_regula.push_back(Gs);
+                  
                   // no i juz zwykla metoda gradientowa
                   _pRulebase->cummulate_differentials(wTrainX[x], wY[x]);
                }         
@@ -289,19 +335,25 @@ void ksi::annbfis_prototype::createFuzzyRulebase(int nClusteringIterations,
                }
             }
 
+      // dump_state();
+      states.push_back(dump_state());
+
+
             //////////////////////////////////
             // test: wyznaczam blad systemu
 
             std::vector<double> wYelaborated (nValY);
-            for (std::size_t x = 0; x < nX; x++)
+            for (std::size_t x = 0; x < nValY; x++)
                wYelaborated[x] = answer( *(validateX.getDatum(x)));
 
             ///////////////////////////
             ksi::error_RMSE rmse;
             double blad = rmse.getError(wvalidateY, wYelaborated);
-            errors.push_front(blad);
+            errors.push_front(blad); // TODO 
 
-            eta = modify_learning_coefficient(eta, errors); // modify learning coefficient
+            // FIXME
+            // eta = modify_learning_coefficient(eta, errors); // modify learning coefficient
+            
             // remember the best rulebase:
             if (dbTheBestRMSE > blad)
             {
@@ -311,6 +363,12 @@ void ksi::annbfis_prototype::createFuzzyRulebase(int nClusteringIterations,
             ///////////////////////////
          }
       } CATCH;
+
+      {
+         std::ofstream f{"debug.json"};
+         f << std::setw(4) << debug_dump << std::endl;
+      }
+
       // system nastrojony :-)
       // update the rulebase with the best one:
       delete _pRulebase;

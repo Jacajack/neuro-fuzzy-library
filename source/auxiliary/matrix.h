@@ -228,7 +228,7 @@ namespace ksi
            */
          void random_shuffle_rows()
          {
-            static std::default_random_engine engine(std::chrono::system_clock().now().time_since_epoch().count());
+            static std::default_random_engine engine(12312321);
             std::shuffle(data.begin(), data.end(), engine);
          }
 

@@ -12,7 +12,7 @@ double ksi::imp_reichenbach::imply (double x, double y) const
 
 double ksi::imp_reichenbach::G(double F, double w) const
 {
-   return w * F / 0.5;
+   return w * F / 2.0;
 }
  
 ksi::implication * ksi::imp_reichenbach::clone() const 

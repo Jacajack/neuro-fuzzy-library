@@ -24,7 +24,7 @@ namespace ksi
 {
    class neuro_fuzzy_system  : public generative_model, public discriminative_model
    {
-   protected:
+   public:
       /** number of rules **/
       int _nRules = -1;
       
