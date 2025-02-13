@@ -43,3 +43,16 @@ source/results/
 /.vscode
 # Temporary VS file
 *.pdb
+
+
+**.py
+*proba*.*
+.cache/
+build-Debug/
+compile_commands.json
+neuro-fuzzy-library.code-workspace
+out copy 2.gif
+out copy 3.gif
+out copy.gif
+out.gif
+test.octave

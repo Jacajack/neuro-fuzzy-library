@@ -1,11 +1,34 @@
 #include <iostream>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #pragma GCC diagnostic ignored "-Winconsistent-missing-override"
 #include <tnorms/t-norm-product.h>
+#include <implications/imp-fodor.h>
+#include <implications/imp-goedel.h>
+#include <implications/imp-goguen.h>
+#include <implications/imp-kleene-dienes.h>
+#include <implications/imp-lukasiewicz.h>
 #include <implications/imp-reichenbach.h>
+#include <implications/imp-rescher.h>
+#include <implications/imp-zadeh.h>
+#include <tnorms/t-norm.h>
+#include <tnorms/t-norm-dombi.h>
+#include <tnorms/t-norm-drastic.h>
+#include <tnorms/t-norm-dubois-prade.h>
+#include <tnorms/t-norm-einstein.h>
+#include <tnorms/t-norm-fodor.h>
+#include <tnorms/t-norm-frank.h>
+#include <tnorms/t-norm-hamacher.h>
+#include <tnorms/t-norm-lukasiewicz.h>
+#include <tnorms/t-norm-min.h>
+#include <tnorms/t-norm-parametrized.h>
+#include <tnorms/t-norm-product.h>
+#include <tnorms/t-norm-schweizer-sklar.h>
+#include <tnorms/t-norm-sugeno-weber.h>
+#include <tnorms/t-norm-yager.h>
 #include <neuro-fuzzy/annbfis.h>
 #include <common/number.h>
 #include <partitions/fcm.h>
@@ -50,8 +73,6 @@ public:
 class extended_nfs : public ksi::annbfis, public extended_nfs_base
 {
 public:
-	// static_assert(std::is_base_of_v<ksi::neuro_fuzzy_system, T>, "Only works with NFS");
-	// static_assert(std::is_base_of_v<ksi::abstract_annbfis, T>, "Only works with NFS");
 
 	extended_nfs(
 		int nRules,
@@ -130,9 +151,6 @@ public:
 			throw std::runtime_error{"rulebase invalid"};
 
 		auto y_arr = json::array();
-		// auto ds_test = _TestDataset.splitDataSetVertically(_TestDataset.getNumberOfAttributes() - 1);
-		// auto ds_test = _TestDataset.getNumberOfData();
-
 		for (std::size_t i = 0; i < ds_test.getNumberOfData(); i++)
 			y_arr.push_back(answer(*(ds_test.getDatum(i))));
 
@@ -142,13 +160,52 @@ public:
 	}
 };
 
+std::unique_ptr<ksi::implication> make_implication(const std::string &name)
+{
+	#define MATCH(val, type) do { if (name == val) return std::make_unique<type>(); } while (false)
+	MATCH("fodor", ksi::imp_fodor);
+	MATCH("goedel", ksi::imp_goedel);
+	MATCH("goguen", ksi::imp_goguen);
+	MATCH("kleene_dienes", ksi::imp_kleene_dienes);
+	MATCH("lukasiewicz", ksi::imp_lukasiewicz);
+	MATCH("reichenbach", ksi::imp_reichenbach);
+	MATCH("rescher", ksi::imp_rescher);
+	MATCH("zadeh", ksi::imp_zadeh);
+	#undef MATCH
+	throw std::runtime_error{"invalid implication name"};
+}
+
+std::unique_ptr<ksi::t_norm> make_tnorm(const std::string &name)
+{
+	#define MATCH(val, type) do { if (name == val) return std::make_unique<type>(); } while (false)
+	// MATCH("dombi", ksi::t_norm_dombi);
+    MATCH("drastic", ksi::t_norm_drastic);
+    // MATCH("dubois_prade", ksi::t_norm_dubois_prade);
+    MATCH("einstein", ksi::t_norm_einstein);
+    MATCH("fodor", ksi::t_norm_fodor);
+    // MATCH("frank", ksi::t_norm_frank);
+    // MATCH("hamacher", ksi::t_norm_hamacher);
+    MATCH("lukasiewicz", ksi::t_norm_lukasiewicz);
+    MATCH("min", ksi::t_norm_min);
+    // MATCH("parametrized", ksi::t_norm_parametrized);
+    MATCH("product", ksi::t_norm_product);
+    // MATCH("schweizer_sklar", ksi::t_norm_schweizer_sklar);
+    // MATCH("sugeno_weber", ksi::t_norm_sugeno_weber);
+    // MATCH("yager", ksi::t_norm_yager);
+	#undef MATCH
+	throw std::runtime_error{"invalid tnorm name"};
+}
+
 
 struct train_context
 {
-
+	std::unique_ptr<ksi::implication> impl;
+	std::unique_ptr<ksi::t_norm> tnorm;
+	std::unique_ptr<extended_nfs_base> sys;
+	json train_result;
 };
 
-std::pair<std::unique_ptr<extended_nfs_base>, json> train_system(const json &j)
+std::unique_ptr<train_context> train_system(const json &j)
 {
 	const auto &config = j.at("config");
 	const auto &dataset = j.at("Xy_train");
@@ -159,20 +216,21 @@ std::pair<std::unique_ptr<extended_nfs_base>, json> train_system(const json &j)
 	const double eta = config.at("eta");
 
 	std::cerr << "Will train system..." << std::endl;
-	ksi::imp_reichenbach implication;
-	ksi::t_norm_product tnorm;
+	auto ctx = std::make_unique<train_context>();
 
-	auto sys = std::unique_ptr<extended_nfs>{new extended_nfs{
+	ctx->impl = make_implication(config.at("implication"));
+	ctx->tnorm = make_tnorm(config.at("tnorm"));
+	ctx->sys = std::make_unique<extended_nfs>(
 		num_rules,
 		clustering_iters,
 		tuning_iters,
 		eta,
 		normalize,
-		tnorm,
-		implication
-	}};
+		*ctx->tnorm,
+		*ctx->impl
+	);
 
-	auto train_result = sys->train(
+	ctx->train_result = ctx->sys->train(
 		dataset,
 		num_rules, 
 		clustering_iters, 
@@ -181,7 +239,7 @@ std::pair<std::unique_ptr<extended_nfs_base>, json> train_system(const json &j)
 		normalize
 	);
 
-	return {std::move(sys), train_result};
+	return ctx;
 }
 
 json test_system(extended_nfs_base& sys, const json &j)
@@ -192,7 +250,7 @@ json test_system(extended_nfs_base& sys, const json &j)
 
 int main()
 {
-	std::unique_ptr<extended_nfs_base> sys;
+	std::unique_ptr<train_context> ctx;
 
 	while (std::cin.peek() != EOF)
 	{
@@ -208,16 +266,15 @@ int main()
 
 		if (j.at("cmd") == "train")
 		{
-			json train_result;
-			std::tie(sys, train_result) = train_system(j);
-			std::cout << train_result << std::endl;
+			ctx = train_system(j);
+			std::cout << ctx->train_result << std::endl;
 		}
 		else if (j.at("cmd") == "test")
 		{
-			if (!sys)
+			if (!ctx || !ctx->sys)
 				throw std::runtime_error{"not trained"};
 			
-			json test_result = test_system(*sys, j);
+			json test_result = test_system(*ctx->sys, j);
 			std::cout << test_result << std::endl;
 		}
 		else
