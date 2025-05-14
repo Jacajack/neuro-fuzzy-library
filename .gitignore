@@ -48,6 +48,7 @@ source/results/
 **.py
 *proba*.*
 .cache/
+build*
 build-Debug/
 compile_commands.json
 neuro-fuzzy-library.code-workspace

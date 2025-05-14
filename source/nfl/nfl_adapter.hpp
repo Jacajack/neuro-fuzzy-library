@@ -10,6 +10,7 @@
 #pragma GCC diagnostic ignored "-Wextra"
 #include <neuro-fuzzy/annbfis.h>
 #include <neuro-fuzzy/annbfis_prototype.h>
+#include <neuro-fuzzy/tsk_prototype.h>
 #include <neuro-fuzzy/fac_prototype.h>
 #include <auxiliary/roc.h>
 #pragma GCC diagnostic pop
@@ -131,6 +132,7 @@ public:
 };
 
 using extended_annbfis_prototype = extended_nfs<ksi::annbfis_prototype>;
+using extended_tsk_prototype = extended_nfs<ksi::tsk_prototype>;
 
 struct train_context
 {

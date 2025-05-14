@@ -233,6 +233,33 @@ std::unique_ptr<train_context> make_system(
 			th
 		);
 	}
+	else if (system_type == "tsk_prototype" && regression_task)
+	{
+		ctx->fac_proto = std::make_unique<ksi::fac_prototype_minkowski_regression>(minkowski_coeff);
+		ctx->sys = std::make_unique<extended_tsk_prototype>(
+			num_rules,
+			clustering_iters,
+			tuning_iters,
+			eta,
+			normalize,
+			*ctx->fac_proto
+		);
+	}
+	else if (system_type == "tsk_prototype" && !regression_task)	
+	{
+		ctx->fac_proto = std::make_unique<ksi::fac_prototype_minkowski_classification>(minkowski_coeff, 1, 0);
+		ctx->sys = std::make_unique<extended_tsk_prototype>(
+			num_rules,
+			clustering_iters,
+			tuning_iters,
+			eta,
+			normalize,
+			*ctx->fac_proto,
+			pos_class,
+			neg_class,
+			th
+		);
+	}
 	else
 		throw std::runtime_error{"bad system_type"};
 
