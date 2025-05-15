@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 project(neuro_fuzzy)
 
 find_package(nlohmann_json REQUIRED)
-find_package(OpenMP COMPONENTS OpenMP_CXX)
+find_package(OpenMP REQUIRED)
 
 add_library(sanitizers INTERFACE)
 target_compile_options(sanitizers INTERFACE -fsanitize=address -fsanitize=undefined)
